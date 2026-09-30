@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      CHROMA_DIR: /app/chroma_db
+      # Used when LLM_PROVIDER=ollama
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - chroma:/app/chroma_db
+      - hf-cache:/app/.cache/huggingface
+      - ./data:/app/data
+
+  # Optional fully-local LLM. Start with:  docker compose --profile local up
+  # then pull a model once:  docker compose exec ollama ollama pull llama3.2
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["local"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
+volumes:
+  chroma:
+  hf-cache:
+  ollama:
